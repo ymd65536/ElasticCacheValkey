@@ -41,6 +41,10 @@ Valkeyが登場したとき、背景を知らない人からすると「なん�
 
 また、すでにValkeyへの開発にシフトしてしまってもとに戻ることができないといった開発者の事情もあるでしょう。（筆者が同じ立場、開発者ならそう考えます）
 
+## 参考
+
+- [Linux Foundation Launches Open Source Valkey Community](https://www.linuxfoundation.org/press/linux-foundation-launches-open-source-valkey-community)
+
 # AWS CLI インストールと SSO ログイン手順 (Linux環境)
 
 このガイドでは、Linux環境でAWS CLIをインストールし、AWS SSOを使用してログインするまでの手順を説明します。
