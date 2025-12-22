@@ -58,6 +58,15 @@ Serverlessなのでユニット利用時に料金がかかります。計算が�
 
 どんなものか理解できたところでハンズオンしていきましょう。
 
+おおまかな手順
+
+- キャッシュの作成
+- デフォルトVPCの作成
+- Cloud Shellの起動
+- valkey-cli のセットアップ
+- キーバリューストアのテスト
+- キャッシュの削除
+
 ## 参考
 
 - [Linux Foundation Launches Open Source Valkey Community](https://www.linuxfoundation.org/press/linux-foundation-launches-open-source-valkey-community)
