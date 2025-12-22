@@ -41,6 +41,23 @@ Valkeyが登場したとき、背景を知らない人からすると「なん�
 
 また、すでにValkeyへの開発にシフトしてしまってもとに戻ることができないといった開発者の事情もあるでしょう。（筆者が同じ立場、開発者ならそう考えます）
 
+## Amazon ElastiCache for Valkeyの料金
+
+このあとハンズオンしていきますが、そのまえに料金表を確認しましょう。
+今回はServerlessでハンズオンするのでServerlessの料金に注目します。
+細かい料金計算は難しいと思いますので割愛しますが、理解しておくべき主な課金要素は以下の2つです。
+
+- データの保存
+- ElastiCache Processing Units (ECPU)
+
+[引用：Amazon ElastiCache の料金](https://aws.amazon.com/jp/elasticache/pricing/)
+
+Serverlessなのでユニット利用時に料金がかかります。計算が終了してもデータ保存で料金が発生するので注意しましょう。
+
+## ハンズオン
+
+どんなものか理解できたところでハンズオンしていきましょう。
+
 ## 参考
 
 - [Linux Foundation Launches Open Source Valkey Community](https://www.linuxfoundation.org/press/linux-foundation-launches-open-source-valkey-community)
