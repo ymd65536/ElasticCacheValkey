@@ -61,6 +61,8 @@ Serverlessなのでユニット利用時に料金がかかります。計算が�
 ## 参考
 
 - [Linux Foundation Launches Open Source Valkey Community](https://www.linuxfoundation.org/press/linux-foundation-launches-open-source-valkey-community)
+- [Valkey 用 Amazon ElastiCache の発表 - AWS](https://aws.amazon.com/jp/about-aws/whats-new/2024/10/amazon-elasticache-valkey/)
+- [Valkey 互換キャッシュ、Memcached 互換キャッシュ、Redis OSS 互換キャッシュ – Amazon ElastiCache – AWS](https://aws.amazon.com/jp/elasticache/)
 
 # AWS CLI インストールと SSO ログイン手順 (Linux環境)
 
