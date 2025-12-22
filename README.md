@@ -1,3 +1,33 @@
+# 【AWS】検証！〜
+
+## はじめに
+
+この記事では「この前リリースされた機能って実際に動かすとどんな感じなんだろう」とか 「もしかしたら内容次第では使えるかも？？」などAWSサービスの中でも特定の機能にフォーカスして検証していく記事です。
+
+主な内容としては実践したときのメモを中心に書きます。（忘れやすいことなど） 誤りなどがあれば書き直していく予定です。
+
+今回はAmazon ElastiCacheで利用できるAmazon ElastiCache for Valkey（以下、本文ではValkeyと表記し、Amazon ElastiCache for Redisの場合においては「Redis」と表記）を検証してみます。
+
+[参考：Amazon ElastiCache for Valkeyの開始方法](https://aws.amazon.com/jp/blogs/news/get-started-with-amazon-elasticache-for-valkey/)
+
+## Amazon ElastiCache for Valkeyとは
+
+まずは今回検証するValkeyについて見ていきましょう。`What is Valkey?`では以下のように説明されています。
+
+> Valkey is an open source, in-memory, high performance, key-value datastore. It is a drop-in replacement for Redis OSS. It can be used for a variety of workloads such as caching, session stores, and message queues, and can act as a primary database. Valkey can run as either a standalone daemon or in a cluster, with options for replication and high availability.
+
+[引用：What is Valkey? - Valkey Explained - AWS](https://aws.amazon.com/jp/elasticache/what-is-valkey/)
+
+どんなものか簡単にまとめると「Redis OSSの代替として開発されたオープンソースのインメモリ型キーバリューデータストア」ということになります。
+
+## なんでValkeyなんですか？Redisじゃいけないんですか
+
+Valkeyが登場したとき、背景を知らない人からすると「なんで？これが必要なの？」
+「今までずっとRedisで上手くいっていたのに、なぜ変える必要があるのか？」という疑問が浮かんだと思います。
+
+技術的にも経済的にもValkeyのほうが優秀に見えるのでそれが代替（Alternative）の理由となったと勘違いしそうですが
+実際は技術的な背景ではなく、非常に複雑なライセンス事情が絡んでいます。
+
 # AWS CLI インストールと SSO ログイン手順 (Linux環境)
 
 このガイドでは、Linux環境でAWS CLIをインストールし、AWS SSOを使用してログインするまでの手順を説明します。
