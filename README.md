@@ -84,8 +84,10 @@ Serverlessなのでユニット利用時に料金がかかります。計算が�
 aws elasticache create-user --user-id valkey-default-user --user-name default --engine valkey --passwords "YourStrongPassword123!" --access-string "on ~* +@all"
 ```
 
+グループを作成してユーザーを追加します。以下のコマンドを実行してください。
+
 ```bash
-aws elasticache create-user-group --user-group-id my-user-group --engine valkey --user-ids valkey-default-user my-user
+aws elasticache create-user-group --user-group-id my-user-group --engine valkey --user-ids valkey-default-user
 ```
 
 もとからあるユーザーグループにユーザーを追加する場合は以下のコマンドを実行します。
