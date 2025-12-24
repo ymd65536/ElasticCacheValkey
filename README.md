@@ -54,18 +54,132 @@ Valkeyが登場したとき、背景を知らない人からすると「なん�
 
 Serverlessなのでユニット利用時に料金がかかります。計算が終了してもデータ保存で料金が発生するので注意しましょう。
 
+## キャッシュの操作方法
+
+操作方法はいくつかあります。具体的には以下のとおりです。
+
+- valkey-cli
+
 ## ハンズオン
 
 どんなものか理解できたところでハンズオンしていきましょう。
 
 おおまかな手順
 
+- AWSマネジメントコンソールを開いてAWS Cloud Shellを起動
 - キャッシュの作成
 - デフォルトVPCの作成
 - Cloud Shellの起動
 - valkey-cli のセットアップ
 - キーバリューストアのテスト
 - キャッシュの削除
+
+### キャッシュの作成
+
+まずはAWS Cloud Shellを起動し、以下のコマンドでValkeyのキャッシュを作成します。
+今回はAWS IAM Identity Center (SSO)でログインしていることを前提としています。権限はAdministratorAccessです。
+
+```bash
+aws elasticache create-serverless-cache --serverless-cache-name ec-valkey-serverless --engine valkey --region ap-northeast-1
+```
+
+実行結果
+
+```json
+{
+    "ServerlessCache": {
+        "ServerlessCacheName": "ec-valkey-serverless",
+        "Description": " ",
+        "CreateTime": "2025-12-24T07:43:57.288000+00:00",
+        "Status": "creating",
+        "Engine": "valkey",
+        "MajorEngineVersion": "8",
+        "SecurityGroupIds": [
+            "sg-XXXX"
+        ],
+        "ARN": "arn:aws:elasticache:ap-northeast-1:00000000:serverlesscache:ec-valkey-serverless",
+        "SubnetIds": [
+            "subnet-XX1",
+            "subnet-XX2",
+            "subnet-XX3"
+        ],
+        "SnapshotRetentionLimit": 0,
+        "DailySnapshotTime": "17:30"
+    }
+}
+```
+
+キャッシュを作成できました。
+
+### valkey-cli のセットアップ
+
+次にvalkey-cliをセットアップします。以下のコマンドを実行してください。
+
+```bash
+sudo yum install gcc jemalloc-devel openssl-devel tcl tcl-devel -y 
+wget https://github.com/valkey-io/valkey/archive/refs/tags/7.2.7.tar.gz 
+tar xvzf 7.2.7.tar.gz 
+cd valkey-7.2.7/ 
+make BUILD_TLS=yes install
+```
+
+### キャッシュの確認
+
+キャッシュが作成されたか確認しましょう。以下のコマンドを実行してください。
+
+```bash
+aws elasticache describe-serverless-caches --serverless-cache-name ec-valkey-serverless --region ap-northeast-1
+```
+
+実行結果
+
+```json
+{
+    "ServerlessCaches": [
+        {
+            "ServerlessCacheName": "ec-valkey-serverless",
+            "Description": " ",
+            "CreateTime": "2025-12-24T07:43:57.288000+00:00",
+            "Status": "available",
+            "Engine": "valkey",
+            "MajorEngineVersion": "8",
+            "FullEngineVersion": "8.1",
+            "SecurityGroupIds": [
+                "sg-XXX"
+            ],
+            "Endpoint": {
+                "Address": "ec-valkey-serverless-XXXX.serverless.apne1.cache.amazonaws.com",
+                "Port": 6379
+            },
+            "ReaderEndpoint": {
+                "Address": "ec-valkey-serverless-XXXX.serverless.apne1.cache.amazonaws.com",
+                "Port": 6380
+            },
+            "ARN": "arn:aws:elasticache:ap-northeast-1:0000000:serverlesscache:ec-valkey-serverless",
+            "SubnetIds": [
+                "subnet-XXX1",
+                "subnet-XXX2",
+                "subnet-XXX3"
+            ],
+            "SnapshotRetentionLimit": 0,
+            "DailySnapshotTime": "17:30"
+        }
+    ]
+}
+```
+
+出力されることを確認したら以下のコマンドでエンドポイントとポート番号を取得しましょう。
+
+```bash
+export ENDPOINT=`aws elasticache describe-serverless-caches --serverless-cache-name ec-valkey-serverless --region ap-northeast-1 --query "ServerlessCaches[0].Endpoint.Address" --output text` && echo $ENDPOINT
+export PORT=`aws elasticache describe-serverless-caches --serverless-cache-name ec-valkey-serverless --region ap-northeast-1 --query "ServerlessCaches[0].Endpoint.Port" --output text` && echo $PORT
+```
+
+### キーバリューストアのテスト
+
+```bash
+valkey-cli -h $ENDPOINT -p $PORT -c --tls
+```
 
 ## 参考
 
