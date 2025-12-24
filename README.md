@@ -67,6 +67,7 @@ Serverlessなのでユニット利用時に料金がかかります。計算が�
 おおまかな手順
 
 - AWSマネジメントコンソールを開いてAWS Cloud Shellを起動
+- ユーザーの作成
 - キャッシュの作成
 - デフォルトVPCの作成
 - Cloud Shellの起動
@@ -80,36 +81,24 @@ Serverlessなのでユニット利用時に料金がかかります。計算が�
 今回はAWS IAM Identity Center (SSO)でログインしていることを前提としています。権限はAdministratorAccessです。
 
 ```bash
-aws elasticache create-serverless-cache --serverless-cache-name ec-valkey-serverless --engine valkey --region ap-northeast-1
+aws elasticache create-user --user-id valkey-default-user --user-name default --engine valkey --passwords "YourStrongPassword123!" --access-string "on ~* +@all"
 ```
 
-実行結果
-
-```json
-{
-    "ServerlessCache": {
-        "ServerlessCacheName": "ec-valkey-serverless",
-        "Description": " ",
-        "CreateTime": "2025-12-24T07:43:57.288000+00:00",
-        "Status": "creating",
-        "Engine": "valkey",
-        "MajorEngineVersion": "8",
-        "SecurityGroupIds": [
-            "sg-XXXX"
-        ],
-        "ARN": "arn:aws:elasticache:ap-northeast-1:00000000:serverlesscache:ec-valkey-serverless",
-        "SubnetIds": [
-            "subnet-XX1",
-            "subnet-XX2",
-            "subnet-XX3"
-        ],
-        "SnapshotRetentionLimit": 0,
-        "DailySnapshotTime": "17:30"
-    }
-}
+```bash
+aws elasticache create-user-group --user-group-id my-user-group --engine valkey --user-ids valkey-default-user my-user
 ```
 
-キャッシュを作成できました。
+もとからあるユーザーグループにユーザーを追加する場合は以下のコマンドを実行します。
+
+```bash
+aws elasticache modify-serverless-cache --serverless-cache-name ec-valkey-serverless --user-group-id my-user-group
+```
+
+次にキャッシュを作成します。以下のコマンドを実行してください。ユーザーグループIDは先ほど作成したものを指定します。
+
+```bash
+aws elasticache create-serverless-cache --serverless-cache-name ec-valkey-serverless --engine valkey --user-group-id my-user-group --region ap-northeast-1
+```
 
 ### valkey-cli のセットアップ
 
@@ -178,7 +167,7 @@ export PORT=`aws elasticache describe-serverless-caches --serverless-cache-name 
 ### キーバリューストアのテスト
 
 ```bash
-valkey-cli -h $ENDPOINT -p $PORT -c --tls
+valkey-cli -h ${ENDPOINT} -p ${PORT} -c --tls -t 15 --askpass
 ```
 
 ## 参考
