@@ -1,5 +1,11 @@
 # 【AWS】検証！〜
 
+## この記事のポイント
+
+- Amazon ElastiCache for Valkeyの概要がわかるYo
+- Valkeyの基本的な操作方法がわかるYo
+- AWS Cloud Shellを使ってハンズオンできるYo
+
 ## はじめに
 
 この記事では「この前リリースされた機能って実際に動かすとどんな感じなんだろう」とか 「もしかしたら内容次第では使えるかも？？」などAWSサービスの中でも特定の機能にフォーカスして検証していく記事です。
@@ -424,7 +430,11 @@ aws cloudformation delete-stack --stack-name ec2
 
 ## まとめ
 
+valkeyの概要と基本的な操作方法、そしてAWS Cloud Shellを使ったハンズオンを紹介しました。ValkeyはRedis OSSの代替として注目されており、今後の動向に注目が集まっています。
 
+また、今回は紹介しませんでしたが、Redis以外にもServerlessのキャッシュとしてElastiCache for Memcachedや同じRedis互換のキャシュサービスとしてMomento Cacheなどもあります。用途に応じて最適なキャッシュを選択することが重要です。
+
+[参考：【Momento】Momento CLI のハンズオン！](https://qiita.com/ymd65536/items/11ea2e58a45049995e93)
 
 ## 参考
 
