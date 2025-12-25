@@ -4,7 +4,7 @@
 
 - Amazon ElastiCache for Valkeyの概要がわかるYo
 - Valkeyの基本的な操作方法がわかるYo
-- AWS Cloud Shellを使ってハンズオンできるYo
+- AWS CloudShellを使ってハンズオンできるYo
 
 ## はじめに
 
@@ -31,21 +31,21 @@
 Valkeyが登場したとき、背景を知らない人からすると「なんで？これが必要なの？」
 「今までずっとRedisで上手くいっていたのに、なぜ変える必要があるのか？」という疑問が浮かんだと思います。
 
-技術的にも経済的にもValkeyのほうが優秀に見えるのでそれが代替（Alternative）の理由となったと勘違いしそうですが
+技術的そして経済的にもValkeyのほうが優秀に見えるのでそれが代替（Alternative）の理由となったと勘違いしそうですが
 実際は技術的な背景ではなく、非常に複雑なライセンス事情が絡んでいます。
 
 ### 複雑なライセンス事情の話
 
-長年愛されているRedisはBSDライセンスとして無料で商用利用可能な状態で提供されていましたが
+長年愛されているRedisはBSDライセンスとして無料かつ商用利用可能な状態で提供されていましたが
 2024年3月に開発元のRedis社が方針を転換し、ライセンスを変更することになりました。
 
 なお、2025年5月のRedis8においては方針を一部修正してライセンスも違う形で提供するというアナウンスがされており
 現在においてはOSI(オープンソースイニシアチブ)承認済みであり、再びOSSとして利用できるようになっています。
 
 ただし、こういった形で利用に不信感をもたせたことや変更後のライセンス(AGPL)の縛りが強いことなどあり、Valkeyが注目を浴びることになりました。
-※この件はについて、視点はさまざまでAWSやGoogleが強力に推進していることやLinux Foundationという中立な組織傘下で管理されているからといった見方もあります。
+※この件について、視点はさまざまでAWSやGoogleが強力に推進していることやLinux Foundationという中立な組織傘下で管理されているからといった見方もあります。
 
-また、すでにValkeyへの開発にシフトしてしまってもとに戻ることができないといった開発者の事情もあるでしょう。（筆者が同じ立場、開発者ならそう考えます）
+また、すでにValkeyへの開発にシフトしてしまってもとに戻ることができないといった開発者の事情もあるでしょう。（筆者が同じ立場の開発者ならそう考えます）
 
 ## Amazon ElastiCache for Valkeyの料金
 
@@ -72,22 +72,20 @@ Serverlessなのでユニット利用時に料金がかかります。計算が�
 
 おおまかな手順
 
-- AWSマネジメントコンソールを開いてAWS Cloud Shellを起動
+- AWSマネジメントコンソールを開いてAWS CloudShellを起動
 - ユーザーの作成
 - キャッシュの作成
-- デフォルトVPCの作成
-- Cloud Shellの起動
 - valkey-cli のセットアップ
 - キーバリューストアのテスト
 - キャッシュの削除
 
 今回はAWS IAM Identity Center (SSO)でログインしていることを前提としています。権限はAdministratorAccessです。
 
-### AWS Cloud Shellの起動とEC2インスタンスの作成
+### AWS CloudShellの起動とEC2インスタンスの作成
 
-まずはAWS Cloud Shellを起動してキャッシュを作成するためのEC2インスタンスを作成します。
+まずはAWS CloudShellを起動してキャッシュを作成するためのEC2インスタンスを作成します。
 
-[ec2.yml](https://github.com/ymd65536/ElasticCacheValkey/blob/main/ec2.yml)をダウンロードしてCloud Shellにアップロードしてください。
+[ec2.yml](https://github.com/ymd65536/ElasticCacheValkey/blob/main/ec2.yml)をダウンロードしてCloudShellにアップロードしてください。
 
 アップロードできたら、以下のコマンドを実行してEC2を構築します。
 
@@ -430,17 +428,20 @@ aws cloudformation delete-stack --stack-name ec2
 
 ## まとめ
 
-valkeyの概要と基本的な操作方法、そしてAWS Cloud Shellを使ったハンズオンを紹介しました。ValkeyはRedis OSSの代替として注目されており、今後の動向に注目が集まっています。
+valkeyの概要と基本的な操作方法、そしてAWS CloudShellを使ったハンズオンを紹介しました。ValkeyはRedis OSSの代替として注目されており、今後の動向に注目が集まっています。
 
 また、今回は紹介しませんでしたが、Redis以外にもServerlessのキャッシュとしてElastiCache for Memcachedや同じRedis互換のキャシュサービスとしてMomento Cacheなどもあります。用途に応じて最適なキャッシュを選択することが重要です。
 
 [参考：【Momento】Momento CLI のハンズオン！](https://qiita.com/ymd65536/items/11ea2e58a45049995e93)
+
+なお、今回はCloudShellのみでやろうとしましたが、なぜかvalkey-cliが動作しなかったので細かく検証したいと思いました。
 
 ## 参考
 
 - [Linux Foundation Launches Open Source Valkey Community](https://www.linuxfoundation.org/press/linux-foundation-launches-open-source-valkey-community)
 - [Valkey 用 Amazon ElastiCache の発表 - AWS](https://aws.amazon.com/jp/about-aws/whats-new/2024/10/amazon-elasticache-valkey/)
 - [Valkey 互換キャッシュ、Memcached 互換キャッシュ、Redis OSS 互換キャッシュ – Amazon ElastiCache – AWS](https://aws.amazon.com/jp/elasticache/)
+- [valkey cliコマンドリファレンス](https://valkey.io/commands/)
 
 # AWS CLI インストールと SSO ログイン手順 (Linux環境)
 
