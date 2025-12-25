@@ -96,6 +96,12 @@ export INSTANCE_ID=`aws ec2 describe-instances --filters "Name=instance-state-na
 aws ssm start-session --target $INSTANCE_ID
 ```
 
+bashを起動します。
+
+```bash
+bash
+```
+
 ### キャッシュの作成
 
 EC2インスタンスにログインできたらキャッシュを作成していきます。
@@ -208,11 +214,217 @@ YourStrongPassword123!
 なお、本番環境ではパスワードをコマンドラインで指定するのは避け、より安全な方法、（たとえば、IAMロールの利用）で接続してください。
 また、TLS接続を使用することを強くオススメします。
 
-### キーとバリューの設定
+### キーとバリューの設定と取得
+
+まずはシンプルなキーとバリューの設定を試してみましょう。以下のコマンドを実行してください。
+
+```bash
+SET favorite_car "ferrari sf90 spider"
+```
+
+実行結果
+
+```text
+OK
+```
+
+Keyがセットされたか確認します。
+
+```bash
+EXISTS favorite_car
+```
+
+実行結果
+
+```text
+(integer) 1
+```
+
+次に設定したキーとバリューを取得してみましょう。以下のコマンドを実行してください。
+
+```bash
+GET favorite_car
+```
+
+実行結果
+
+```text
+"ferrari sf90 spider"
+```
+
+### ハッシュ操作
+
+次にハッシュ操作を試してみましょう。以下のコマンドを実行してください。
+この例では車の情報をハッシュで保存します。
 
 ```bash
 hset car:1 make ferrari model sf90spider year 2024 engine "4.0 L V8" horsepower 769hp transmission "8-speed auto" price 580000
 ```
+
+実行結果
+
+```text
+(integer) 7
+```
+
+次に設定したキーとバリューを取得してみましょう。以下のコマンドを実行してください。
+
+```bash
+HMGET car:1 make model price
+```
+
+実行結果
+
+```text
+1) "ferrari"
+2) "sf90spider"
+3) "580000"
+```
+
+すべてのフィールドと値を取得してみましょう。以下のコマンドを実行してください。
+
+```bash
+HGETALL car:1
+```
+
+実行結果
+
+```text
+ 1) "year"
+ 2) "2024"
+ 3) "engine"
+ 4) "4.0 L V8"
+ 5) "transmission"
+ 6) "8-speed auto"
+ 7) "price"
+ 8) "580000"
+ 9) "make"
+10) "ferrari"
+11) "model"
+12) "sf90spider"
+13) "horsepower"
+14) "769hp"
+```
+
+### リスト操作
+
+リスト操作も試してみましょう。以下のコマンドを実行してください。
+この例ではスポーツカーのリストを作成します。
+
+```bash
+LPUSH sports_cars "ferrari sf90 spider" "lamborghini aventador" "porsche 911 turbo s"
+```
+
+LPUSHはリストの先頭に要素を追加します。RPUSHを使うとリストの末尾に要素を追加できます。
+
+実行結果
+
+```text
+(integer) 3
+```
+
+次にリストの要素を取得してみましょう。以下のコマンドを実行してください。
+
+```bash
+LRANGE sports_cars 0 -1
+```
+
+実行結果
+
+```text
+1) "porsche 911 turbo s"
+2) "lamborghini aventador"
+3) "ferrari sf90 spider"
+```
+
+第3引数の`-1`はリストの最後の要素を意味します。`-2`、`-3`と指定して実行してみると、リストの末尾から順に要素を取得できることがわかります。
+
+### キーの管理
+
+キーの管理も試してみましょう。以下のコマンドを実行してください。
+
+```bash
+HKEYS car:1
+```
+
+実行結果
+
+```text
+1) "year"
+2) "engine"
+3) "transmission"
+4) "price"
+5) "make"
+6) "model"
+7) "horsepower"
+```
+
+これでハッシュのすべてのフィールド名を取得できました。
+
+最後にexitを実行してvalkey-cliを終了します。
+
+```bash
+exit
+```
+
+## キャッシュの削除
+
+キャッシュの削除を行います。以下のコマンドを実行してください。
+
+```bash
+aws elasticache delete-serverless-cache --serverless-cache-name ec-valkey-serverless --region ap-northeast-1
+```
+
+削除には時間がかかります。状態を確認するには以下のコマンドを実行します。`deleting`と表示されている間は削除中です。
+
+```bash
+aws elasticache describe-serverless-caches --serverless-cache-name ec-valkey-serverless --region ap-northeast-1 --query "ServerlessCaches[0].Status" --output text
+```
+
+### ユーザーとユーザーグループの削除
+
+ユーザーとユーザーグループも削除しておきましょう。
+
+まずはグループを削除します。
+以下のコマンドを実行してください。
+
+```bash
+aws elasticache delete-user-group --user-group-id my-user-group
+```
+
+時間がかかる場合があります。
+
+次にユーザーを削除します。以下のコマンドを実行してください。
+
+```bash
+aws elasticache delete-user --user-id valkey-default-user
+```
+
+これでキャッシュ、ユーザー、ユーザーグループの削除が完了しました。
+
+### 終了処理
+
+bashからもexitします。
+
+```bash
+exit
+```
+
+SSMセッションを終了します。
+
+```bash
+exit
+```
+
+今回作成したCloudFormationスタックを削除します。
+
+```bash
+aws cloudformation delete-stack --stack-name ec2
+```
+
+## まとめ
+
+
 
 ## 参考
 
