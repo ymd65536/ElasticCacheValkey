@@ -75,10 +75,32 @@ Serverlessなのでユニット利用時に料金がかかります。計算が�
 - キーバリューストアのテスト
 - キャッシュの削除
 
+今回はAWS IAM Identity Center (SSO)でログインしていることを前提としています。権限はAdministratorAccessです。
+
+### AWS Cloud Shellの起動とEC2インスタンスの作成
+
+まずはAWS Cloud Shellを起動してキャッシュを作成するためのEC2インスタンスを作成します。
+
+[ec2.yml](https://github.com/ymd65536/ElasticCacheValkey/blob/main/ec2.yml)をダウンロードしてCloud Shellにアップロードしてください。
+
+アップロードできたら、以下のコマンドを実行してEC2を構築します。
+
+```bash
+aws cloudformation deploy --stack-name ec2 --template-file ./ec2.yml --tags Name=qiita --capabilities CAPABILITY_NAMED_IAM
+```
+
+EC2インスタンスが起動したら、以下のコマンドでSSMセッションを開始します。
+
+```bash
+export INSTANCE_ID=`aws ec2 describe-instances --filters "Name=instance-state-name,Values=running" --query 'Reservations[*].Instances[*].[InstanceId]' --output text`
+aws ssm start-session --target $INSTANCE_ID
+```
+
 ### キャッシュの作成
 
-まずはAWS Cloud Shellを起動し、以下のコマンドでValkeyのキャッシュを作成します。
-今回はAWS IAM Identity Center (SSO)でログインしていることを前提としています。権限はAdministratorAccessです。
+EC2インスタンスにログインできたらキャッシュを作成していきます。
+
+以下のコマンドでValkeyのキャッシュを作成します。
 
 ```bash
 aws elasticache create-user --user-id valkey-default-user --user-name default --engine valkey --passwords "YourStrongPassword123!" --access-string "on ~* +@all"
@@ -90,16 +112,16 @@ aws elasticache create-user --user-id valkey-default-user --user-name default --
 aws elasticache create-user-group --user-group-id my-user-group --engine valkey --user-ids valkey-default-user
 ```
 
-もとからあるユーザーグループにユーザーを追加する場合は以下のコマンドを実行します。
-
-```bash
-aws elasticache modify-serverless-cache --serverless-cache-name ec-valkey-serverless --user-group-id my-user-group
-```
-
 次にキャッシュを作成します。以下のコマンドを実行してください。ユーザーグループIDは先ほど作成したものを指定します。
 
 ```bash
 aws elasticache create-serverless-cache --serverless-cache-name ec-valkey-serverless --engine valkey --user-group-id my-user-group --region ap-northeast-1
+```
+
+もとからあるユーザーグループにユーザーを追加する場合は以下のコマンドを実行します。
+
+```bash
+aws elasticache modify-serverless-cache --serverless-cache-name ec-valkey-serverless --user-group-id my-user-group
 ```
 
 ### valkey-cli のセットアップ
@@ -107,12 +129,14 @@ aws elasticache create-serverless-cache --serverless-cache-name ec-valkey-server
 次にvalkey-cliをセットアップします。以下のコマンドを実行してください。
 
 ```bash
-sudo yum install gcc jemalloc-devel openssl-devel tcl tcl-devel -y 
-wget https://github.com/valkey-io/valkey/archive/refs/tags/7.2.7.tar.gz 
-tar xvzf 7.2.7.tar.gz 
-cd valkey-7.2.7/ 
-make BUILD_TLS=yes install
+sudo yum install gcc jemalloc-devel openssl-devel tcl tcl-devel -y
+sudo wget https://github.com/valkey-io/valkey/archive/refs/tags/7.2.7.tar.gz
+sudo tar xvzf 7.2.7.tar.gz
+cd valkey-7.2.7/
+sudo make BUILD_TLS=yes install
 ```
+
+出力の最後に`make[1]: Leaving directory '/usr/bin/valkey-7.2.7/src'`と表示されたらインストール完了です。
 
 ### キャッシュの確認
 
@@ -168,8 +192,26 @@ export PORT=`aws elasticache describe-serverless-caches --serverless-cache-name 
 
 ### キーバリューストアのテスト
 
+それではvalkey-cliを使ってキーバリューストアのテストを行いましょう。以下のコマンドを実行してください。
+
 ```bash
-valkey-cli -h ${ENDPOINT} -p ${PORT} -c --tls -t 15 --askpass
+valkey-cli -h ${ENDPOINT} -p ${PORT} -c --tls --askpass
+```
+
+パスワードの入力を求められたら、キャッシュ作成時に設定したパスワードを入力してください。
+この例では以下のパスワードです。
+
+```bash
+YourStrongPassword123!
+```
+
+なお、本番環境ではパスワードをコマンドラインで指定するのは避け、より安全な方法、（たとえば、IAMロールの利用）で接続してください。
+また、TLS接続を使用することを強くオススメします。
+
+### キーとバリューの設定
+
+```bash
+hset car:1 make ferrari model sf90spider year 2024 engine "4.0 L V8" horsepower 769hp transmission "8-speed auto" price 580000
 ```
 
 ## 参考

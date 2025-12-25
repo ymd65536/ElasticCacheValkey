@@ -2,10 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Description: EC2 instance configuration with t3.micro
 
 Parameters:
-  KeyName:
-    Type: AWS::EC2::KeyPair::KeyName
-    Description: EC2 key pair name for SSM access
-  
   LatestAmiId:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: /aws/service/ami-amazon-linux-latest/al2023-ami-kernel-default-x86_64
@@ -24,6 +20,7 @@ Resources:
             Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+        - arn:aws:iam::aws:policy/AmazonElastiCacheFullAccess
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-role'
@@ -39,7 +36,6 @@ Resources:
     Properties:
       InstanceType: t3.micro
       ImageId: !Ref LatestAmiId
-      KeyName: !Ref KeyName
       IamInstanceProfile: !Ref EC2InstanceProfile
       SecurityGroups:
         - !Ref InstanceSecurityGroup
@@ -51,12 +47,6 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security group for EC2 instance (SSM access only)
-      SecurityGroupEgress:
-        - IpProtocol: tcp
-          FromPort: 443
-          ToPort: 443
-          CidrIp: 0.0.0.0/0
-          Description: HTTPS for SSM endpoints
       Tags:
         - Key: Name
           Value: !Sub '${AWS::StackName}-sg'
